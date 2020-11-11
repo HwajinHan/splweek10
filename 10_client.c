@@ -15,6 +15,8 @@ int main (int argc, char *argv[]) {
 	struct hostent *h;
 	struct sockaddr_in saddr;
 	char buf[MAXLINE];
+	char buff[MAXLINE];
+	char context[MAXLINE];
 	char text[MAX];
 	char *host = argv[1]; //localhost
 	int port = atoi(argv[2]); // 10002 example
@@ -41,31 +43,33 @@ int main (int argc, char *argv[]) {
 		int readbuf;
 		memset(buf,0,MAXLINE); 
 		memset(text,0,MAX);
+		memset(buff,0,MAXLINE);
+		memset(context,0,MAXLINE);
 		int total = 0;
 		n = read(0, buf, MAXLINE); //stdin by me (filename).
 		buf[n-1] = '\0';
-		write(1,buf,MAXLINE);
-		write(cfd,buf,MAXLINE);
+		write(cfd,buf,n);
+		printf("title: %s\n",buf);
 		if(!strcmp(buf,"quit")){
 		    exit(0);
 		    break;
 		}else{
 		fd=open(buf,O_RDONLY); // open by filename.
-		memset(buf,0,MAXLINE);
 		
-		while((n=read(fd,buf,1))>0){ // read the file data
-		    strncat(text,buf,1);
+		while((n=read(fd,context,1))>0){ // read the file data
+		    strncat(text,context,1);
 		     //send the file one by one byte
 		    //write(1,buf,n); //print the file contents
 		    total++; //total file size
 		}
 		text[total-1]='\0';
-		memset(buf,0,MAXLINE);
-		sprintf(buf,"%d",total);
-		write(cfd,buf,MAXLINE);
-		write(cfd,text,MAX);
+		sprintf(buff,"%d",total);
+		printf("file size: %s Byte\n",buff);
+		write(cfd,buff,MAXLINE);
+		printf("contentx: %s\n",text);
+		write(cfd,text,total);
 		close(fd);
-		printf("%d bytes sended.\n" , total);
+		printf("Send %d bytes to the server.\n" , total);
 		}
 		/*** Insert your code ***/
 		

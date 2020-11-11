@@ -16,6 +16,7 @@ int main (int argc, char *argv[]) {
 	struct hostent *h;
 	struct sockaddr_in saddr, caddr;
 	char buf[MAXLINE];
+	char buff[MAXLINE];
 	char text[MAX];
 	
 	char newfilename[MAXLINE+5];
@@ -45,33 +46,36 @@ int main (int argc, char *argv[]) {
 	}
 	int filesize;
 	int fd;
+	int count=0;
 	while (1) {
-		char copy[6]="_copy";
-		char fname[20]="FILE NAME: ";
 		int total = 0;
-		memset(buf,0,MAXLINE);
-		memset(text,0,MAX); //test.txt
-		memset(newfilename,0,MAXLINE+5);
-		n = read(connfd, buf, MAXLINE);
+		memset(buf,0,MAXLINE); // test.txt
+		memset(text,0,MAX); // contents
+		memset(newfilename,0,MAXLINE+5); // new filename
+		memset(buff,0,MAXLINE); // size of file
+		n=read(connfd,buf,MAXLINE);
+		 // test.txt
 		// Receive name of file
-		int filename;
-	
+		int filename;	
+		printf("title: %s\n", buf);
 		if(!strcmp(buf,"quit")){
 		    exit(0);
 		    break;
 		}else{
+		strcat(buf,"_copy"); // test.txt_copy
 		strcat(newfilename,buf);
-		strcat(newfilename,"_copy");
-		memset(copy,0,20);
-		write(1,fname,20);
-		write(1,newfilename,MAXLINE+5);
 		fd=open(newfilename,O_CREAT|O_WRONLY,0644);
+		printf("new filename: %s\n",newfilename);
 		memset(buf,0,MAXLINE);
-		n=read(connfd,buf,MAXLINE);
-		filesize=atoi(buf);
-		n=read(connfd,text,MAX);	
-		write(fd,text,n);
-		sleep(1);
+		n=read(connfd,buff,MAXLINE);
+		printf("filesize: %s\n", buff);
+		filesize=atoi(buff);
+		printf("Got %d bytes received from client.\n",filesize);
+		n=read(connfd,text,MAX);
+		printf("contents: %s\n",text);
+		write(fd,text,filesize);
+		sleep(5);
+		count++;
 		close(fd);
 		/*** Insert your code ***/
 		}
